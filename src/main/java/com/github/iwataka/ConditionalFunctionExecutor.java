@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class ConditionalExecutor<T, R> {
+public class ConditionalFunctionExecutor<T, R> {
 
     private final List<ConditionalFunction<T, R>> funcList;
 
-    public ConditionalExecutor() {
+    public ConditionalFunctionExecutor() {
         funcList = new ArrayList<>();
     }
 
     public <T2> Condition<T, T2, R> whenInstanceOf(Class<T2> clazz) {
-        Predicate<T> cond = (T t) -> clazz.isInstance(t);
+        final Predicate<T> cond = (T t) -> clazz.isInstance(t);
         return new Condition<>(this, cond);
     }
 
@@ -26,7 +26,7 @@ public class ConditionalExecutor<T, R> {
                 .orElseThrow(() -> new NotMatchAnyConditionException());
     }
 
-    void add(ConditionalFunction<T, R> func) {
+    void addFunction(ConditionalFunction<T, R> func) {
         funcList.add(func);
     }
 

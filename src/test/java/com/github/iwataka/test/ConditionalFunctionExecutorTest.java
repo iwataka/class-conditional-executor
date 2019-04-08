@@ -1,12 +1,12 @@
 package com.github.iwataka.test;
 
-import com.github.iwataka.ConditionalExecutor;
+import com.github.iwataka.ConditionalFunctionExecutor;
 import com.github.iwataka.NotMatchAnyConditionException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ConditionalExecutorTest {
+public class ConditionalFunctionExecutorTest {
 
     private class Foo {
 
@@ -42,11 +42,17 @@ public class ConditionalExecutorTest {
         }
     }
 
-    private static final ConditionalExecutor<Object, Object> keyGetter = new ConditionalExecutor<>()
+    private static final ConditionalFunctionExecutor<Object, Object> keyGetter = new ConditionalFunctionExecutor<>()
             .whenInstanceOf(Foo.class)
             .then(Foo::getKey1)
             .whenInstanceOf(Bar.class)
             .then(Bar::getKey2);
+
+    private static final ConditionalFunctionExecutor<Object, String> classNameGetter = new ConditionalFunctionExecutor<Object, String>()
+            .whenInstanceOf(Foo.class)
+            .then(Foo.class.getSimpleName())
+            .whenInstanceOf(Bar.class)
+            .then(Bar.class.getSimpleName());
 
 
     @Test
@@ -64,5 +70,11 @@ public class ConditionalExecutorTest {
     @Test
     public void test_apply_throwException() {
         assertThrows(NotMatchAnyConditionException.class, () -> keyGetter.apply(new Object()));
+    }
+
+    @Test
+    public void test_apply_forConstantExecutor() throws NotMatchAnyConditionException {
+        assertEquals(Foo.class.getSimpleName(), classNameGetter.apply(new Foo(new Object())));
+        assertEquals(Bar.class.getSimpleName(), classNameGetter.apply(new Bar(new Object())));
     }
 }
